@@ -1,6 +1,11 @@
-import { defineMiddlewares, validateAndTransformBody } from "@medusajs/framework/http";
+import { defineMiddlewares, validateAndTransformQuery, validateAndTransformBody } from "@medusajs/framework/http";
+import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { PostAdminCreateBrand } from "./admin/brands/validators";
+
 import { z } from "zod"
+
+export const GetBrandsSchema = createFindParams()
+
 
 export default defineMiddlewares({
     routes: [
@@ -8,8 +13,25 @@ export default defineMiddlewares({
             matcher: "/admin/brands",
             method: "POST",
             middlewares: [
-                validateAndTransformBody(PostAdminCreateBrand)
-            ]
+                validateAndTransformQuery(
+                  GetBrandsSchema,
+                  {
+                    defaults: [
+                      "id",
+                      "name",
+                      "products.*",
+                    ],
+                    isList: true,
+                  }
+                ),
+              ]
+        },
+        {
+          matcher: "/admin/brands",
+          method: "POST",
+          middlewares: [
+              validateAndTransformBody(PostAdminCreateBrand)
+          ]
         },
         {
             matcher: "/admin/products",
